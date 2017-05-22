@@ -32,7 +32,7 @@
             %tbody
               %tr
                 %td
-                  %a{:href => '/mps'} Abiertas
+                  %a{:href => '/mps'} Opened
                 %td.text-right= @mp.count
             %tfoot
               %tr
@@ -46,11 +46,11 @@
             %tbody
               %tr
                 %td
-                  %a{:href => '/pus'} Pendentes
+                  %a{:href => '/pus'} Pending
                 %td.text-right= @pu.editable.count
               %tr
                 %td
-                  %a{:href => '/staff'} Bloqueados (staff)
+                  %a{:href => '/staff'} Blocked (staff)
                 %td.text-right= @pu.blocked.count
             %tfoot
               %tr
