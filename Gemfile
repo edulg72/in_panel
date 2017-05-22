@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.1.4'
+gem 'rails', '4.2.5'
 
 # Fix the conflict with the system 'rake':
 #gem 'rake', '0.9.6'
