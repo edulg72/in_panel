@@ -28,12 +28,12 @@ LatSouth = ARGV[5].to_f
 Step = ARGV[6].to_f
 
 agent = Mechanize.new
-begin
-  page = agent.get "https://www.waze.com/row-Descartes-live/app/Session"
-rescue Mechanize::ResponseCodeError
-  csrf_token = agent.cookie_jar.jar['www.waze.com']['/']['_csrf_token'].value
-end
-login = agent.post('https://www.waze.com/login/create', {"user_id" => USER, "password" => PASS}, {"X-CSRF-Token" => csrf_token})
+#begin
+#  page = agent.get "https://www.waze.com/row-Descartes-live/app/Session"
+#rescue Mechanize::ResponseCodeError
+#  csrf_token = agent.cookie_jar.jar['www.waze.com']['/']['_csrf_token'].value
+#end
+#login = agent.post('https://www.waze.com/login/create', {"user_id" => USER, "password" => PASS}, {"X-CSRF-Token" => csrf_token})
 
 db = PG::Connection.new(:hostaddr => ENV['POSTGRESQL_DB_HOST'], :dbname => 'in_panel', :user => ENV['POSTGRESQL_DB_USERNAME'], :password => ENV['POSTGRESQL_DB_PASSWORD'])
 db.prepare('insert_user','insert into users (id, username, rank) values ($1,$2,$3)')
@@ -52,7 +52,8 @@ def scan_UR(db,agent,longWest,latNorth,longEast,latSouth,step,exec)
       area = [lonStart, latStart, lonEnd, latEnd]
 
       begin
-        wme = agent.get "https://www.waze.com/row-Descartes-live/app/Features?venueLevel=1&venueFilter=1&venueUpdateRequests=true&bbox=#{area.join('%2C')}"
+        agent.cookie_jar.clear!
+        wme = agent.get "https://www.waze.com/row-Descartes-live/app/Features?venueLevel=1&venueFilter=1&venueUpdateRequests=true&bbox=#{area.join('%2C')}&sandbox=true"
 
         json = JSON.parse(wme.body)
 
@@ -106,7 +107,7 @@ def scan_UR(db,agent,longWest,latNorth,longEast,latSouth,step,exec)
         end
       rescue Mechanize::ResponseCodeError, Mechanize::ChunkedTerminationError
         # If we had errors with the response size, divides area in four smaller areas (only 3 times)
-        if exec < 3
+        if exec < 2
           scan_UR(db,agent,area[0],area[1],area[2],area[3],(step/2),(exec+1))
         else
           puts "[#{Time.now.strftime('%d/%m/%Y %H:%M:%S')}] - ResponseCodeError at #{area}"
